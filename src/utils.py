@@ -83,9 +83,9 @@ def book_appointment(request_header, details, mobile, generate_captcha_pref, api
                     "                        Hey, Hey, Hey! It's your lucky day!                       "
                 )
                 print("\nPress any key thrice to exit program.")
-                #                return True
+                #                return 1000
                 os.system("pause")
-                os.system("pause")#
+                os.system("pause")
                 os.system("pause")
                 sys.exit()
 
@@ -146,6 +146,7 @@ def check_and_book(
         dose_num = kwargs['dose_num']
         excluded_pincodes = kwargs['excluded_pincodes'],
         reschedule_inp = kwargs['reschedule_inp']
+
 
         if isinstance(start_date, int) and start_date == 2:
             start_date = (
