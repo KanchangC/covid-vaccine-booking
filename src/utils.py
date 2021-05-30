@@ -942,7 +942,18 @@ def collect_user_details(request_header):
         "\n================================= Additional Info =================================\n"
     )
 
-    minimum_slots = len(beneficiary_dtls)
+    # Set booking condition (either one after another or all at once)
+    minimum_slots = input(
+        f"Filter out centers with availability less than ? default (Maximum) {len(beneficiary_dtls)} : "
+    )
+    if minimum_slots:
+        minimum_slots = (
+            int(minimum_slots)
+            if int(minimum_slots) == 1
+            else len(beneficiary_dtls)
+        )
+    else:
+        minimum_slots = len(beneficiary_dtls)
 
     # Get refresh frequency
     refresh_freq = input(
