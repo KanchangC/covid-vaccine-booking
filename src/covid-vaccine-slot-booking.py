@@ -153,7 +153,7 @@ def main():
         if info.minimum_slots != len(info.beneficiary_dtls):
             for beneficiary in info.beneficiary_dtls:
                 multi_cycle_book(request_header, token, mobile, otp_pref, base_request_header, otp_validation_header,
-                                 info, beneficiary, collected_details)
+                                 info, [beneficiary], collected_details)
             print('\n press any key twice to exit \n')
             os.system("pause")
             os.system("pause")

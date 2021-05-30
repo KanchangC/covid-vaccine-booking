@@ -63,14 +63,6 @@ def book_appointment(request_header, details, mobile, generate_captcha_pref, api
             resp = requests.post(BOOKING_URL, headers=request_header, json=details)
             print(f"Booking Response Code: {resp.status_code}")
             print(f"Booking Response : {resp.text}")
-            booked_appointment_id = resp.text
-            booked_appointment_id = (booked_appointment_id[29:65])
-            print(booked_appointment_id)
-            response = requests.get("https://cdn-api.co-vin.in/api/v2/appointment/appointmentslip/download?appointment_id={}".format(booked_appointment_id), headers=request_header)
-            if response.status_code == 200:
-                filename = "appointment_slip" + booked_appointment_id
-                with open(filename, 'wb') as f:
-                    f.write(response.content)
             if resp.status_code == 401:
                 print("TOKEN INVALID")
                 return False
@@ -82,8 +74,19 @@ def book_appointment(request_header, details, mobile, generate_captcha_pref, api
                 print(
                     "                        Hey, Hey, Hey! It's your lucky day!                       "
                 )
-#                print("\nPress any key thrice to exit program.")
-                break
+                booked_appointment_id = resp.text
+                booked_appointment_id = (booked_appointment_id[32:68])
+                print(booked_appointment_id)
+                response = requests.get(
+                    "https://cdn-api.co-vin.in/api/v2/appointment/appointmentslip/download?appointment_id={}".format(
+                        booked_appointment_id), headers=request_header)
+                if response.status_code == 200:
+                    filename = "appointment_slip" + booked_appointment_id
+                    with open(filename, 'wb') as f:
+                        f.write(response.content)
+
+                #                print("\nPress any key thrice to exit program.")
+                return 1000
 #                os.system("pause")
 #                os.system("pause")
 #                os.system("pause")
@@ -249,66 +252,73 @@ def check_and_book(
             # if captcha automation is enabled then have less duration for stale information of centers & slots.
             MAX_ALLOWED_DURATION_OF_STALE_INFORMATION_IN_SECS = 1 * 30 if captcha_automation != 'n' else 1 * 5
             # Now try to look into all options unless it is not authentication related issue
-            for i in range(0, len(options)):
-                option = options[i]
-                all_slots_of_a_center = option.get("slots", [])
-                if not all_slots_of_a_center:
-                    continue
-                for selected_slot in all_slots_of_a_center:
-                    current_epoch = int(time.time())
-                    if current_epoch - start_epoch >= MAX_ALLOWED_DURATION_OF_STALE_INFORMATION_IN_SECS:
-                        print(
-                            "\n\ntried too many centers but still not able to book, look for current status of "
-                            "centers....\n\n")
-                        return True
+            retun_to_main_loop = 0
+            if retun_to_main_loop > 0:
+                return False
+            else:
+                for i in range(0, len(options)):
+                    option = options[i]
+                    all_slots_of_a_center = option.get("slots", [])
+                    if not all_slots_of_a_center:
+                        continue
+                    for selected_slot in all_slots_of_a_center:
+                        current_epoch = int(time.time())
+                        if current_epoch - start_epoch >= MAX_ALLOWED_DURATION_OF_STALE_INFORMATION_IN_SECS:
+                            print(
+                                "\n\ntried too many centers but still not able to book, look for current status of "
+                                "centers....\n\n")
+                            return True
 
-                    try:
-                        center_id = option["center_id"]
-                        print(f"\n============> Trying Choice # {i} Center # {center_id}, Slot #{selected_slot}")
+                        try:
+                            center_id = option["center_id"]
+                            print(f"\n============> Trying Choice # {i} Center # {center_id}, Slot #{selected_slot}")
 
-                        dose_num = 2 if [beneficiary["status"] for beneficiary in beneficiary_dtls][
-                                            0] == "Partially Vaccinated" else 1
-                        # reschedule
+                            dose_num = 2 if [beneficiary["status"] for beneficiary in beneficiary_dtls][
+                                                0] == "Partially Vaccinated" else 1
+                            # reschedule
 
-                        if reschedule_inp == "y":
-                            new_req = {
-                                "appointment_id": beneficiary_dtls[0]['appointment_id'],
-                                "center_id": option["center_id"],
-                                "session_id": option["session_id"],
-                                "slot": selected_slot,
-                            }
-                            print(f"Booking with info: {new_req}")
-                            booking_status = reschedule_appointment(request_header, new_req, mobile, captcha_automation,
-                                                                    captcha_automation_api_key, captcha_api_choice)
+                            if reschedule_inp == "y":
+                                new_req = {
+                                    "appointment_id": beneficiary_dtls[0]['appointment_id'],
+                                    "center_id": option["center_id"],
+                                    "session_id": option["session_id"],
+                                    "slot": selected_slot,
+                                }
+                                print(f"Booking with info: {new_req}")
+                                booking_status = reschedule_appointment(request_header, new_req, mobile, captcha_automation,
+                                                                        captcha_automation_api_key, captcha_api_choice)
 
-                        else:
-                            new_req = {
-                                "beneficiaries": [
-                                    beneficiary["bref_id"] for beneficiary in beneficiary_dtls
-                                ],
-                                "dose": dose_num,
-                                "center_id": option["center_id"],
-                                "session_id": option["session_id"],
-                                "slot": selected_slot,
-                            }
-                            print(f"Booking with info: {new_req}")
-                            booking_status = book_appointment(request_header, new_req, mobile, captcha_automation,
-                                                              captcha_automation_api_key, captcha_api_choice)
-                        # is token error ? If yes then break the loop by returning immediately
-                        if booking_status == 0:
-                            return False
-                        else:
-                            # try irrespective of booking status as it will be beneficial choice.
-                            # try different center as slots are full for this center
-                            # break the slots loop
-                            print('Center is fully booked..Trying another...')
-                            break
-                    except IndexError:
-                        print("============> Invalid Option!")
-                        os.system("pause")
-                        pass
-            # tried all slots of all centers but still not able to book then look for current status of centers
-            return True
+                            else:
+                                new_req = {
+                                    "beneficiaries": [
+                                        beneficiary["bref_id"] for beneficiary in beneficiary_dtls
+                                    ],
+                                    "dose": dose_num,
+                                    "center_id": option["center_id"],
+                                    "session_id": option["session_id"],
+                                    "slot": selected_slot,
+                                }
+                                print(f"Booking with info: {new_req}")
+                                booking_status = book_appointment(request_header, new_req, mobile, captcha_automation,
+                                                                  captcha_automation_api_key, captcha_api_choice)
+                            # is token error ? If yes then break the loop by returning immediately
+                            if booking_status == 0:
+                                return False
+                            elif booking_status == 1000:
+                                return_to_main_loop = return_to_main_loop + 1
+                                break
+                            else:
+                                # try irrespective of booking status as it will be beneficial choice.
+                                # try different center as slots are full for this center
+                                # break the slots loop
+                                print('Center is fully booked..Trying another...')
+                                break
+                        except IndexError:
+                            print("============> Invalid Option!")
+                            os.system("pause")
+                            pass
+                # tried all slots of all centers but still not able to book then look for current status of centers
+                return True
 
 
 # --------------this function was developed to filter centers by excluded pincode ---------------#
@@ -588,6 +598,7 @@ def check_calendar_by_district(
                     print(
                         f"Centers available in {location['district_name']} from {start_date} as of {today.strftime('%Y-%m-%d %H:%M:%S')}: {len(resp['centers'])}"
                     )
+                    print(f"\n checking for available slots in  {len(resp['centers']) - len(excluded_pincodes)} centers as per your choice (of excluded pincodes)")
                     options += viable_options(
                         resp, minimum_slots, min_age_booking, fee_type, dose_num
                     )
@@ -1386,12 +1397,10 @@ def cancel_appointments(request_header, active_appointments):
     for value_present in appointment_to_cancel:
         data = {
             'appointment_id': value_present['appointment_id'],
-            'beneficiariesToCancel': value_present['beneficiariesToCancel']
+            'beneficiariesToCancel': [value_present['beneficiariesToCancel']]
         }
-        print("defense line")
-        test = input(print("are you sure?"))
         response = requests.post(CANCEL_URL, headers=request_header, json=data)
-        if response.status_code == 200:
+        if response.status_code == 204:
             print(f"appointment of " + str(value_present['name']) + " has been cancelled")
         else:
             print("\n UNABLE TO CANCEL THE APPOINTMENT   \n")
