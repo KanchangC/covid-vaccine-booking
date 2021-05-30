@@ -87,10 +87,10 @@ def book_appointment(request_header, details, mobile, generate_captcha_pref, api
 
                 #                print("\nPress any key thrice to exit program.")
                 return 1000
-#                os.system("pause")
-#                os.system("pause")
-#                os.system("pause")
-#                sys.exit()
+            #                os.system("pause")
+            #                os.system("pause")
+            #                os.system("pause")
+            #                sys.exit()
 
             elif resp.status_code == 409:
                 print(f"Response: {resp.status_code} : {resp.text}")
@@ -252,13 +252,15 @@ def check_and_book(
             # if captcha automation is enabled then have less duration for stale information of centers & slots.
             MAX_ALLOWED_DURATION_OF_STALE_INFORMATION_IN_SECS = 1 * 30 if captcha_automation != 'n' else 1 * 5
             # Now try to look into all options unless it is not authentication related issue
-            retun_to_main_loop = 0
-            if retun_to_main_loop > 0:
-                return False
-            else:
-                for i in range(0, len(options)):
-                    option = options[i]
-                    all_slots_of_a_center = option.get("slots", [])
+            return_to_main_loop = 0
+
+            for i in range(0, len(options)):
+                option = options[i]
+                all_slots_of_a_center = option.get("slots", [])
+                ## break and go out of infinite while
+                if return_to_main_loop > 0:
+                    return False
+                else:
                     if not all_slots_of_a_center:
                         continue
                     for selected_slot in all_slots_of_a_center:
@@ -285,7 +287,8 @@ def check_and_book(
                                     "slot": selected_slot,
                                 }
                                 print(f"Booking with info: {new_req}")
-                                booking_status = reschedule_appointment(request_header, new_req, mobile, captcha_automation,
+                                booking_status = reschedule_appointment(request_header, new_req, mobile,
+                                                                        captcha_automation,
                                                                         captcha_automation_api_key, captcha_api_choice)
 
                             else:
@@ -596,9 +599,8 @@ def check_calendar_by_district(
 
                 if "centers" in resp:
                     print(
-                        f"Centers available in {location['district_name']} from {start_date} as of {today.strftime('%Y-%m-%d %H:%M:%S')}: {len(resp['centers'])}"
+                        f" Total Centers available in {location['district_name']} from {start_date} as of {today.strftime('%Y-%m-%d %H:%M:%S')}: {len(resp['centers'])}"
                     )
-                    print(f"\n checking for available slots in  {len(resp['centers']) - len(excluded_pincodes)} centers as per your choice (of excluded pincodes)")
                     options += viable_options(
                         resp, minimum_slots, min_age_booking, fee_type, dose_num
                     )
@@ -989,9 +991,9 @@ def collect_user_details(request_header):
         if captcha_api_choice not in ['0', '1']: captcha_api_choice = '0'
         # filling captcha API instead of collecting form user input #
         if captcha_api_choice == '0':
-#            captcha_automation_api_key = "anti captcha api key"
-#        else:
-#            captcha_automation_api_key = "2captcha api key"
+            #            captcha_automation_api_key = "anti captcha api key"
+            #        else:
+            #            captcha_automation_api_key = "2captcha api key"
             captcha_automation_api_key = input("Enter your Anti-Captcha or 2Captcha API key: ")
     elif captcha_automation.lower() == "n":
         captcha_api_choice = None
@@ -1210,7 +1212,7 @@ def viable_options(resp, minimum_slots, min_age_booking, fee_type, dose_num):
     else:
         pass
     if len(options) > 0:
-        print("\n viable options \n")
+        print("\n **************   Centers with available slots found   ****************\n")
         display_table(options)
     return options
 
@@ -1337,11 +1339,23 @@ def reschedule_appointment(request_header, details, mobile, generate_captcha_pre
                 print(
                     "                        YOUR APPOINTMENT HAS BEEN RESCHEDULED                       "
                 )
-                print("\nPress any key thrice to exit program.")
+                re_appointment_id = resp.text
+                re_appointment_id = (re_appointment_id[32:68])
+                response = requests.get(
+                    "https://cdn-api.co-vin.in/api/v2/appointment/appointmentslip/download?appointment_id={}".format(
+                        re_appointment_id), headers=request_header)
+                if response.status_code == 200:
+                    filename = "appointment_slip" + re_appointment_id
+                    with open(filename, 'wb') as f:
+                        f.write(response.content)
+                else:
+                    print("unable to download appointment slip")
+                    print(f"Response: {resp.status_code} : {resp.text}")
+
+                print("\nPress any key twice to exit program.")
                 #                return True
                 os.system("pause")
-                #                os.system("pause")#
-                #                os.system("pause")
+                os.system("pause")
                 sys.exit()
 
             elif resp.status_code == 409:
@@ -1357,7 +1371,7 @@ def reschedule_appointment(request_header, details, mobile, generate_captcha_pre
                 return 2
             elif resp.status_code == 400:
                 print(f"Response: {resp.status_code} : {resp.text}")
-                # Response: 400 : {"errorCode":"APPOIN0044", "error":"Please enter valid security code"}
+                # {"errorCode":"APPOIN0011","error":"You have selected the same vaccination center and date as that of your current appointment. Please select a different vaccination center or the date for rescheduling."}
                 pass
             elif resp.status_code >= 500:
                 print(f"Response: {resp.status_code} : {resp.text}")
