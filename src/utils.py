@@ -1056,7 +1056,6 @@ def get_dose_num(collected_details):
     if any(detail['vaccine']
            for detail in collected_details["beneficiary_dtls"]):
         return 2
-
     return 1
 
 

@@ -150,14 +150,13 @@ def main():
 
         info = SimpleNamespace(**collected_details)
 
-        if info.minimum_slots == 1:
+        if info.minimum_slots != len(info.beneficiary_dtls):
             for beneficiary in info.beneficiary_dtls:
                 multi_cycle_book(request_header, token, mobile, otp_pref, base_request_header, otp_validation_header,
                                  info, beneficiary, collected_details)
         else:
-            beneficiary_dtls = info.beneficiary_dtls
             multi_cycle_book(request_header, token, mobile, otp_pref, base_request_header, otp_validation_header,
-                             info, beneficiary_dtls, collected_details)
+                             info, info.beneficiary_dtls, collected_details)
     except Exception as e:
         print(str(e))
         print('Exiting Script')
