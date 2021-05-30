@@ -83,7 +83,7 @@ def book_appointment(request_header, details, mobile, generate_captcha_pref, api
                     "                        Hey, Hey, Hey! It's your lucky day!                       "
                 )
 #                print("\nPress any key thrice to exit program.")
-                return False
+                break
 #                os.system("pause")
 #                os.system("pause")
 #                os.system("pause")
@@ -146,7 +146,6 @@ def check_and_book(
         dose_num = kwargs['dose_num']
         excluded_pincodes = kwargs['excluded_pincodes'],
         reschedule_inp = kwargs['reschedule_inp']
-
 
         if isinstance(start_date, int) and start_date == 2:
             start_date = (
@@ -271,7 +270,7 @@ def check_and_book(
                                             0] == "Partially Vaccinated" else 1
                         # reschedule
 
-                        if reschedule_inp.lower() == "y":
+                        if reschedule_inp == "y":
                             new_req = {
                                 "appointment_id": beneficiary_dtls[0]['appointment_id'],
                                 "center_id": option["center_id"],
