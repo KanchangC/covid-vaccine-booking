@@ -18,6 +18,7 @@ def is_token_valid(token):
 def multi_cycle_book(request_header, token, mobile, otp_pref, base_request_header, otp_validation_header, info,
                      beneficiary_dtls,
                      collected_details):
+    break_loop = True
     while True:  # infinite-loop
         # create new request_header
         request_header = copy.deepcopy(base_request_header)
@@ -25,6 +26,8 @@ def multi_cycle_book(request_header, token, mobile, otp_pref, base_request_heade
 
         # call function to check and book slots
         try:
+            if break_loop is False:
+                break
             token_valid = is_token_valid(token)
 
             # token is invalid ?
@@ -42,21 +45,21 @@ def multi_cycle_book(request_header, token, mobile, otp_pref, base_request_heade
                             time.sleep(5)
                     elif otp_pref == "y":
                         token = generate_token_OTP_manual(mobile, base_request_header, otp_validation_header)
-            check_and_book(request_header, beneficiary_dtls, info.location_dtls, info.search_option,
-                           min_slots=info.minimum_slots,
-                           ref_freq=info.refresh_freq,
-                           auto_book=info.auto_book,
-                           start_date=info.start_date,
-                           vaccine_type=info.vaccine_type,
-                           fee_type=info.fee_type,
-                           mobile=mobile,
-                           captcha_automation=info.captcha_automation,
-                           captcha_api_choice=info.captcha_api_choice,
-                           captcha_automation_api_key=info.captcha_automation_api_key,
-                           dose_num=get_dose_num(collected_details),
-                           excluded_pincodes=info.excluded_pincodes,
-                           reschedule_inp=info.reschedule_inp
-                           )
+            break_loop = check_and_book(request_header, beneficiary_dtls, info.location_dtls, info.search_option,
+                                        min_slots=info.minimum_slots,
+                                        ref_freq=info.refresh_freq,
+                                        auto_book=info.auto_book,
+                                        start_date=info.start_date,
+                                        vaccine_type=info.vaccine_type,
+                                        fee_type=info.fee_type,
+                                        mobile=mobile,
+                                        captcha_automation=info.captcha_automation,
+                                        captcha_api_choice=info.captcha_api_choice,
+                                        captcha_automation_api_key=info.captcha_automation_api_key,
+                                        dose_num=get_dose_num(collected_details),
+                                        excluded_pincodes=info.excluded_pincodes,
+                                        reschedule_inp=info.reschedule_inp
+                                        )
         except Exception as e:
             print(str(e))
             print('Retrying in 5 seconds')
