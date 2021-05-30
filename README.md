@@ -20,9 +20,11 @@
 
 1. Check availabilty of slots at prefered location 
 2. Option to automate the booking
-3. reschedule active appointment 
-4. cancel active appointment 
-5. download appointment slip
+3. option to book for all selected beneficiaries at once or to book one after another 
+(provides an edge when trying to book off hours when getting more than 1 slot is difficult but you don't want to sit and wait to schedule the scipt for other beneficiary after getting one appointment)
+5. reschedule active appointment 
+6. cancel active appointment 
+7. download appointment slip
 
 
 ### Usage:
