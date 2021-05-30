@@ -82,12 +82,12 @@ def book_appointment(request_header, details, mobile, generate_captcha_pref, api
                 print(
                     "                        Hey, Hey, Hey! It's your lucky day!                       "
                 )
-                print("\nPress any key thrice to exit program.")
-                #                return 1000
-                os.system("pause")
-                os.system("pause")
-                os.system("pause")
-                sys.exit()
+#                print("\nPress any key thrice to exit program.")
+                return False
+#                os.system("pause")
+#                os.system("pause")
+#                os.system("pause")
+#                sys.exit()
 
             elif resp.status_code == 409:
                 print(f"Response: {resp.status_code} : {resp.text}")
