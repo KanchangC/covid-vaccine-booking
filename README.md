@@ -16,6 +16,14 @@
 - Discord ID for DMs: pallupz#5726
 - And finally, I know code quality isn't great. Suggestions are welcome.
 
+### What this script do
+
+1. Check availabilty of slots at prefered location 
+2. Option to automate the booking
+3. reschedule active appointment 
+4. cancel active appointment 
+5. download appointment slip
+
 
 ### Usage:
 
@@ -65,3 +73,24 @@ python src\covid-vaccine-slot-booking.py --mobile=YOUR-MOBILE-NUMBER
 - Open command prompt and run ```python --version```. If everything went well it should say ```Python 3.7.3```
 - You're all set! 
 
+### How it works via IFTTT app on Android to feed OTP to the script
+https://ifttt.com/ is used to create a SMS trigger. The trigger happens when the OTP SMS is received
+The trigger sends the text of the SMS to a REST service, I have used a free service which needs 0 setup for a shared storage
+
+Setup Guide for Android
+Option 1: IFTTT
+Create an account in ifttt.com (A premium paid account is recommended for a quicker response)
+Create a new applet
+If this..... click on Android SMS trigger
+Select "New SMS received matches search" and use CoWIN as the search key
+Then... Choose a service named Webhooks and then select make a web request
+Paste the url: https://kvdb.io/SK2XsE52VMgzwaZMKAK2pc/XXXXXXXXXX replace XXXXXXXXXX with your phone number
+Method is PUT
+Content Type PlainText
+Body: Add ingredient and select Text
+On your android phone, install ifttt app
+Login
+Ensure that the battery saver mode, and all other optimizations are removed. Allow the app to read SMS. The appshould always run (This is the key for quick response).
+Note: 
+1. ifttt configured will ONLY read OTP received from cowin. 
+2. Use IFTTT at your own risk and go through the privacy and data collection/share policy of IFTTT.
