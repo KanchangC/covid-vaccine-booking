@@ -1244,9 +1244,6 @@ def viable_options(resp, minimum_slots, min_age_booking, fee_type, dose_num):
                     pass
     else:
         pass
-    if len(options) > 0:
-        print("\n **************   Centers with available slots found   ****************\n")
-        display_table(options)
     return options
 
 
