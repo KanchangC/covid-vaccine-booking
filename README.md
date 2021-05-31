@@ -18,13 +18,15 @@
 
 ### What this script do
 
-1. Check availabilty of slots at prefered location 
-2. Option to automate the booking
-3. option to book for all selected beneficiaries at once or to book one after another 
-(provides an edge when trying to book off hours when getting more than 1 slot is difficult but you don't want to sit and wait to schedule the scipt for other beneficiary after getting one appointment)
-5. reschedule active appointment 
-6. cancel active appointment 
-7. download appointment slip
+1. Check availabilty of centers and slots at prefered location --> search by district or pincodes)
+2. Fliter out unwanted centeres based on pincodes of a particular district 
+3. Option to automate the booking
+4. Book for all selected beneficiaries at once
+5. Book for a multiple beneficiary one after another 
+--> provides an edge when trying to book in off hours when getting more than 1 slot is difficult but you don't want to sit and wait to schedule the scipt for other beneficiary after getting one appointment
+5. Reschedule active appointment 
+6. Cancel active appointment 
+7. Download appointment slip
 
 
 ### Usage:
@@ -53,17 +55,7 @@ brew install sox
 
 Finally, run the script file as shown below:
 ```
-python src\covid-vaccine-slot-booking.py
-```
-
-If you already have a bearer token, you can also use:
-```
-python src\covid-vaccine-slot-booking.py --token=YOUR-TOKEN-HERE
-```
-
-If you'd prefer to pass the mobile number while running the script instead of typing in later, you can also use:
-```
-python src\covid-vaccine-slot-booking.py --mobile=YOUR-MOBILE-NUMBER
+python3 src\covid-vaccine-slot-booking.py
 ```
 
 ### Python 3.7.3 Installation in Windows
