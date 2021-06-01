@@ -16,8 +16,7 @@ def is_token_valid(token):
 
 
 def multi_cycle_book(request_header, token, mobile, otp_pref, base_request_header, otp_validation_header, info,
-                     beneficiary_dtls,
-                     collected_details):
+                     beneficiary_dtls, collected_details):
     while True:  # infinite-loop
         # create new request_header
         request_header = copy.deepcopy(base_request_header)
@@ -26,9 +25,7 @@ def multi_cycle_book(request_header, token, mobile, otp_pref, base_request_heade
         # call function to check and book slots
         try:
             token_valid = is_token_valid(token)
-
-            # token is invalid ?
-            # If yes, generate new one
+            # If token is not, generate new one
             if not token_valid:
                 print('Token is INVALID.')
                 token = None
@@ -55,8 +52,7 @@ def multi_cycle_book(request_header, token, mobile, otp_pref, base_request_heade
                                         captcha_automation_api_key=info.captcha_automation_api_key,
                                         dose_num=get_dose_num(collected_details),
                                         excluded_pincodes=info.excluded_pincodes,
-                                        reschedule_inp=info.reschedule_inp
-                                        )
+                                        reschedule_inp=info.reschedule_inp)
             if break_loop == "break":
                 break
 
@@ -108,8 +104,9 @@ def main():
             mobile = input("Enter the registered mobile number: ")
             filename = filename + mobile + ".json"
             otp_pref = input(
-                "\nDo you want to enter OTP manually, instead of auto-read? \nRemember selecting n would require some setup described in README (y/n Default n): ")
-            otp_pref = otp_pref if otp_pref else "n"
+                "\nSelect   y   :   Enter OTP manually (Default Choice)"
+                "\nSelect   n   :   Auto Read from IFTTT setup (refer to README for setup)  :  ")
+            otp_pref = otp_pref if otp_pref else "y"
             while token is None:
                 if otp_pref.lower() == "n":
                     try:
@@ -124,16 +121,15 @@ def main():
         request_header = copy.deepcopy(common_header)
         request_header["Authorization"] = f"Bearer {token}"
         if os.path.exists(filename):
-            print("\n=================================== Note ===================================\n")
+            print("\n===================================        Note           =================================\n")
             print(f"Info from perhaps a previous run already exists in {filename} in this directory.")
-            print(
-                f"IMPORTANT: If this is your first time running this version of the application, DO NOT USE THE FILE!")
+            print(f"IMPORTANT: If this is your first time running this version of the application, DO NOT USE THE FILE!")
             try_file = input("Would you like to see the details and confirm to proceed? (y/n Default y): ")
             try_file = try_file if try_file else 'y'
 
             if try_file.lower() == 'y':
                 collected_details = get_saved_user_info(filename)
-                print("\n================================= Info =================================\n")
+                print("\n=====================================          Info        =====================================\n")
                 display_info_dict(collected_details)
 
                 file_acceptable = input("\nProceed with above info? (y/n Default n): ")
@@ -141,11 +137,9 @@ def main():
                 if file_acceptable.lower() != 'y':
                     collected_details = collect_user_details(request_header)
                     save_user_info(filename, collected_details)
-
             else:
                 collected_details = collect_user_details(request_header)
                 save_user_info(filename, collected_details)
-
         else:
             collected_details = collect_user_details(request_header)
             save_user_info(filename, collected_details)
@@ -160,7 +154,7 @@ def main():
             print('\n press any key twice to exit \n')
             os.system("pause")
             os.system("pause")
-            sys.exit()
+            sys.exit(1)
         else:
             multi_cycle_book(request_header, token, mobile, otp_pref, base_request_header, otp_validation_header,
                              info, info.beneficiary_dtls, collected_details)
@@ -168,11 +162,12 @@ def main():
             print('\n press any key twice to exit \n')
             os.system("pause")
             os.system("pause")
-            sys.exit()
+            sys.exit(1)
     except Exception as e:
         print(str(e))
         print('Exiting Script')
         os.system("pause")
+        sys.exit(1)
 
 
 if __name__ == '__main__':
