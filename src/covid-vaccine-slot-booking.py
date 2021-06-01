@@ -69,7 +69,6 @@ def main():
 
     filename = 'vaccine-booking-details-'
     mobile = None
-
     print('Running Script')
     beep(500, 150)
     try:
