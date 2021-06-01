@@ -4,6 +4,21 @@
 
 
 
+### What this script do
+
+1. Check availabilty of centers and slots at prefered location --> search by district or pincodes)
+2. Fliter out unwanted centeres based on pincodes of a particular district 
+3. Slot booking : completely atomated OR select preferred slots manually. 
+4. Book for all selected beneficiaries at once
+5. Book for a multiple beneficiary one after another 
+--> provides an edge when trying to book in off hours when getting more than 1 slot is difficult but you don't want to sit and wait to schedule the scipt for other beneficiary after getting one appointment
+5. Reschedule active appointment 
+6. Cancel active appointment 
+7. Download appointment slip
+
+
+
+
 ### Important: 
 - This is a proof of concept project. I do NOT endorse or condone, in any shape or form, automating any monitoring/booking tasks. **Use at your own risk.**
 - This CANNOT book slots automatically. It doesn't skip any of the steps that a normal user would have to take on the official portal. You will still have to enter the OTP and Captcha.
@@ -16,17 +31,7 @@
 - Discord ID for DMs: pallupz#5726
 - And finally, I know code quality isn't great. Suggestions are welcome.
 
-### What this script do
 
-1. Check availabilty of centers and slots at prefered location --> search by district or pincodes)
-2. Fliter out unwanted centeres based on pincodes of a particular district 
-3. Option to automate the booking
-4. Book for all selected beneficiaries at once
-5. Book for a multiple beneficiary one after another 
---> provides an edge when trying to book in off hours when getting more than 1 slot is difficult but you don't want to sit and wait to schedule the scipt for other beneficiary after getting one appointment
-5. Reschedule active appointment 
-6. Cancel active appointment 
-7. Download appointment slip
 
 
 ### Usage:
@@ -58,6 +63,8 @@ Finally, run the script file as shown below:
 python3 src\covid-vaccine-slot-booking.py
 ```
 
+
+
 ### Python 3.7.3 Installation in Windows
 - Check if Python is already installed by opening command prompt and running ```python --version```.
 - If the above command returns ```Python <some-version-number>``` you're probably good - provided version number is above 3.6
@@ -66,6 +73,9 @@ python3 src\covid-vaccine-slot-booking.py
 - Run that. In the first screen of installer, there will be an option at the bottom to "Add Python 3.7 to Path". Make sure to select it.
 - Open command prompt and run ```python --version```. If everything went well it should say ```Python 3.7.3```
 - You're all set! 
+
+
+
 
 ### How it works via IFTTT app on Android to feed OTP to the script
 https://ifttt.com/ is used to create a SMS trigger. The trigger happens when the OTP SMS is received
