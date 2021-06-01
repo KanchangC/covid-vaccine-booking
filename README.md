@@ -4,6 +4,21 @@
 
 
 
+### What this script do
+
+1. Check availabilty of centers and slots at prefered location --> search by district or pincodes)
+2. Fliter out unwanted centeres based on pincodes of a particular district 
+3. Slot booking : completely atomated OR select preferred slots manually. 
+4. Book for all selected beneficiaries at once
+5. Book for a multiple beneficiary one after another 
+--> provides an edge when trying to book in off hours when getting more than 1 slot is difficult but you don't want to sit and wait to schedule the scipt for other beneficiary after getting one appointment
+5. Reschedule active appointment 
+6. Cancel active appointment 
+7. Download appointment slip
+
+
+
+
 ### Important: 
 - This is a proof of concept project. I do NOT endorse or condone, in any shape or form, automating any monitoring/booking tasks. **Use at your own risk.**
 - This CANNOT book slots automatically. It doesn't skip any of the steps that a normal user would have to take on the official portal. You will still have to enter the OTP and Captcha.
@@ -16,9 +31,8 @@
 - Discord ID for DMs: pallupz#5726
 - And finally, I know code quality isn't great. Suggestions are welcome.
 
-### Noteworthy Forks
-- https://github.com/bombardier-gif/covid-vaccine-booking : I haven't tried this personally but, it looks like a promising, bit more automated solution that would require some more setting up.
-- https://github.com/vishalv26/covid-vaccine-booking : Haven't personally tried this either. It uses portable python and simplifies running the code by avoiding the need for separate Python installation.
+
+
 
 ### Usage:
 
@@ -46,18 +60,10 @@ brew install sox
 
 Finally, run the script file as shown below:
 ```
-python src\covid-vaccine-slot-booking.py
+python3 src\covid-vaccine-slot-booking.py
 ```
 
-If you already have a bearer token, you can also use:
-```
-python src\covid-vaccine-slot-booking.py --token=YOUR-TOKEN-HERE
-```
 
-If you'd prefer to pass the mobile number while running the script instead of typing in later, you can also use:
-```
-python src\covid-vaccine-slot-booking.py --mobile=YOUR-MOBILE-NUMBER
-```
 
 ### Python 3.7.3 Installation in Windows
 - Check if Python is already installed by opening command prompt and running ```python --version```.
@@ -68,3 +74,27 @@ python src\covid-vaccine-slot-booking.py --mobile=YOUR-MOBILE-NUMBER
 - Open command prompt and run ```python --version```. If everything went well it should say ```Python 3.7.3```
 - You're all set! 
 
+
+
+
+### How it works via IFTTT app on Android to feed OTP to the script
+https://ifttt.com/ is used to create a SMS trigger. The trigger happens when the OTP SMS is received
+The trigger sends the text of the SMS to a REST service, I have used a free service which needs 0 setup for a shared storage
+
+Setup Guide for Android
+Option 1: IFTTT
+Create an account in ifttt.com (A premium paid account is recommended for a quicker response)
+Create a new applet
+If this..... click on Android SMS trigger
+Select "New SMS received matches search" and use CoWIN as the search key
+Then... Choose a service named Webhooks and then select make a web request
+Paste the url: https://kvdb.io/SK2XsE52VMgzwaZMKAK2pc/XXXXXXXXXX replace XXXXXXXXXX with your phone number
+Method is PUT
+Content Type PlainText
+Body: Add ingredient and select Text
+On your android phone, install ifttt app
+Login
+Ensure that the battery saver mode, and all other optimizations are removed. Allow the app to read SMS. The appshould always run (This is the key for quick response).
+Note: 
+1. ifttt configured will ONLY read OTP received from cowin. 
+2. Use IFTTT at your own risk and go through the privacy and data collection/share policy of IFTTT.

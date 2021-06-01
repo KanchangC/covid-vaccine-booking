@@ -59,7 +59,7 @@ def book_appointment(request_header, details, mobile, generate_captcha_pref, api
         while valid_captcha:
             captcha = generate_captcha(request_header, generate_captcha_pref, api_key, captcha_api_choice)
             details["captcha"] = captcha
-            #           print("====================================            ATTEMPTING BOOKING          ==================================================")
+            print("================================= ATTEMPTING BOOKING ==================================================")
             resp = requests.post(BOOKING_URL, headers=request_header, json=details)
             #            print(f"Booking Response Code: {resp.status_code}")
             #            print(f"Booking Response : {resp.text}")
@@ -68,16 +68,12 @@ def book_appointment(request_header, details, mobile, generate_captcha_pref, api
                 return resp.status_code
             elif resp.status_code == 200:
                 beep(WARNING_BEEP_DURATION[0], WARNING_BEEP_DURATION[1])
-                print(
-                    "##############       BOOKED!                ############################        BOOKED!      ################")
-                print(
-                    "                                        Hey, Hey, Hey! It's your lucky day!                                  ")
+                print("##############       BOOKED!                ############################        BOOKED!      ################")
+                print("                                        Hey, Hey, Hey! It's your lucky day!                                  ")
                 booked_appointment_id = resp.text
                 booked_appointment_id = (booked_appointment_id[32:68])
                 print(booked_appointment_id)
-                response = requests.get(
-                    DOWNLOAD_APPOINTMENT.format(booked_appointment_id), headers=request_header)
-                #                    "https://cdn-api.co-vin.in/api/v2/appointment/appointmentslip/download?appointment_id={}"
+                response = requests.get(DOWNLOAD_APPOINTMENT.format(booked_appointment_id), headers=request_header)
                 if response.status_code == 200:
                     filename = "appointment_slip" + booked_appointment_id
                     with open(filename, 'wb') as f:
@@ -103,9 +99,7 @@ def book_appointment(request_header, details, mobile, generate_captcha_pref, api
         beep(WARNING_BEEP_DURATION[0], WARNING_BEEP_DURATION[1])
 
 
-def check_and_book(
-        request_header, beneficiary_dtls, location_dtls, search_option, **kwargs
-):
+def check_and_book(request_header, beneficiary_dtls, location_dtls, search_option, **kwargs):
     """
     This function
         1. Checks the vaccination calendar for available slots,
@@ -241,8 +235,7 @@ def check_and_book(
 
                     try:
                         center_id = option["center_id"]
-                        print(
-                            f"\n============> Trying Choice # {i + 1}  Center Name # {option['name']} , Center # {center_id}, Slot #{selected_slot}")
+                        print(f"\n============> Trying Choice # {i + 1}  Center Name # {option['name']} , Center # {center_id}, Slot #{selected_slot}")
 
                         if reschedule_inp == "r" or reschedule_inp == "R":
                             new_req = {
@@ -261,7 +254,6 @@ def check_and_book(
                                 "session_id": option["session_id"],
                                 "slot": selected_slot,
                             }
-#                            print(f"Booking with info: {new_req}")
                             booking_status = book_appointment(request_header, new_req, mobile, captcha_automation,
                                                               captcha_automation_api_key, captcha_api_choice)
                         if booking_status == 1000:
@@ -306,15 +298,12 @@ def get_all_pincodes(request_header, district_id, start_date, min_age):
                            }
                     refined_pincodes.append(tmp)
             if len(refined_pincodes) > 0:
-                print(
-                    "\n List of all available centers : \n you can enter other pincodes too to avoid those center in future\n")
+                print("\n List of all available centers : \n you can enter other pincodes too to avoid those center in future\n")
                 display_table(refined_pincodes)
             else:
-                print(
-                    "\n No available centers found at present.. you can how ever add the pincodes to exclude the centers if they become available  \n")
+                print( "\n No available centers found at present.. you can how ever add the pincodes to exclude the centers if they become available  \n")
             excluded_pincodes = []
-            pincodes = input(
-                "Enter comma separated  pincodes to exclude: \n(you can enter pincodes to avoid those center in future)\n")
+            pincodes = input("Enter comma separated  pincodes to exclude: \n(you can enter pincodes to avoid those center in future)\n")
 
             for idx, pincode in enumerate(pincodes.split(",")):
                 if not pincode or len(pincode) < 6:
@@ -459,7 +448,6 @@ def get_required_beneficiaries(request_header, beneficiaries):
     ]
     print(f"Selected beneficiaries: ")
     display_table(reqd_beneficiaries)
-
     return reqd_beneficiaries
 
 
@@ -472,7 +460,6 @@ def clear_bucket_and_send_OTP(storage_url, mobile, request_header):
     }
     print(f"Requesting OTP with mobile number {mobile}..")
     txnId = requests.post(url=OTP_PRO_URL, json=data, headers=request_header)
-
     if txnId.status_code == 200:
         txnId = txnId.json()["txnId"]
     else:
@@ -482,7 +469,7 @@ def clear_bucket_and_send_OTP(storage_url, mobile, request_header):
         txnId = None
     return txnId
 
-
+ 
 def check_calendar_by_district(request_header, vaccine_type, location_dtls, start_date,
                                minimum_slots, min_age_booking, fee_type, dose_num, excluded_pincodes):
     """
@@ -493,8 +480,7 @@ def check_calendar_by_district(request_header, vaccine_type, location_dtls, star
         4. Returns list of vaccination centers & slots if available
     """
     try:
-        print(
-            "=========================================================================================================================")
+        print("=========================================================================================================================")
         today = datetime.datetime.today()
         base_url = CALENDAR_URL_DISTRICT
 
@@ -590,7 +576,7 @@ def check_calendar_by_pincode(request_header, vaccine_type, location_dtls, start
         4. Returns list of vaccination centers & slots if available
     """
     try:
-        print("===================================================================================")
+        print("============================================================================================================")
         today = datetime.datetime.today()
         base_url = CALENDAR_URL_PINCODE
 
@@ -700,8 +686,7 @@ def collect_user_details(request_header):
         sys.exit(1)
     active_appointment = check_active_appointment(beneficiary_dtls, beneficiaries)
     if len(active_appointment) > 0:
-        print(
-            "\n\n==================================                       Active appointments found                      ======================================\n"
+        print("\n\n==================================                       Active appointments found                      ======================================\n"
             "=======================             Cancel/Reschedule appointment or remove user(s) having active appointment(s)          ========================\n")
         cleaned_appointments_for_display = cleaned_display(active_appointment)
         display_table(cleaned_appointments_for_display)
@@ -713,15 +698,13 @@ def collect_user_details(request_header):
 
         if reschedule_inp.lower() in ["r", "n", "c"] and reschedule_inp.lower() == "r":
             if len(active_appointment) == 1:
-                print(
-                    "\n================================================             Rescheduling appointments for               ===========================================\n")
+                print("\n================================================             Rescheduling appointments for               ===========================================\n")
                 beneficiary_dtls = active_appointment[:]
                 cleaned = cleaned_display(active_appointment)
                 display_table(cleaned)
             else:
                 beneficiary_dtls = collect_reschedule_appointment_data(active_appointment)
-                print(
-                    "\n================================================             Rescheduling appointments for                ===========================================\n")
+                print("\n================================================             Rescheduling appointments for                ===========================================\n")
                 display_table(beneficiary_dtls)
 
         elif reschedule_inp.lower() == 'c':
@@ -735,14 +718,12 @@ def collect_user_details(request_header):
                 if str(filter_beneficiary['bref_id']) not in seen:
                     req_list.append(filter_beneficiary)
             if len(req_list) > 0:
-                print(
-                    "\n================================================             Continuing with...          ================================================\n")
+                print("\n================================================             Continuing with...          ================================================\n")
                 beneficiary_dtls = req_list[:]
                 cleaned_active_benf = cleaned_display(req_list)
                 display_table(cleaned_active_benf)
             else:
-                print(
-                    "\n=======================================       No eligible beneficiary selected for booking.. exiting script..          ======================================\n")
+                print("\n=======================================       No eligible beneficiary selected for booking.. exiting script..          ======================================\n")
                 os.system("pause")
                 sys.exit(1)
     else:
@@ -779,10 +760,8 @@ def collect_user_details(request_header):
             datetime.datetime.strptime(start_date, "%d-%m-%Y")
             today = datetime.datetime.today().strftime("%d-%m-%Y")
             # assuming that a given date more than 15 days in future is of no use
-            if (datetime.datetime.strptime(start_date, "%d-%m-%Y") - datetime.datetime.strptime(today,
-                                                                                                "%d-%m-%Y")).days > 15:
-                print(
-                    "\n\n------------------        Info:  GIVEN DATE IS OUT OF RANGE.. PROCEEDING WITH TOMORROW          -------------------")
+            if (datetime.datetime.strptime(start_date, "%d-%m-%Y") - datetime.datetime.strptime(today, "%d-%m-%Y")).days > 15:
+                print("\n\n------------------        Info:  GIVEN DATE IS OUT OF RANGE.. PROCEEDING WITH TOMORROW          -------------------")
                 start_date = 2
                 search_dose2_date = (datetime.datetime.today() + datetime.timedelta(days=1)).strftime("%d-%m-%Y")
         except ValueError:
@@ -796,18 +775,16 @@ def collect_user_details(request_header):
         for beneficiary in beneficiary_dtls:
             if (datetime.datetime.strptime(beneficiary['dose2_date'], "%d-%m-%Y") - (
                     datetime.datetime.strptime(search_dose2_date, "%d-%m-%Y"))).days > 0:
-                print(
-                    f"\n\n=========================================================    due date for dose2 is too far        ============================================\n\n"
+                print(f"\n\n=========================================================    due date for dose2 is too far        ============================================\n\n"
                     f"\n###########################     Scheduled dose2 date for beneficiary {beneficiary['name']}  is  {beneficiary['dose2_date']}    #################################\n"
                     f"#############################      Please select a start date in between {beneficiary['dose2_date']} and {max_start_date}          ###############################")
-                print(
-                    "\n ============================================      exiting script due to invalid start date       ======================================\n")
+                print("\n ============================================      exiting script due to invalid start date       ======================================\n")
                 os.system("pause")
                 sys.exit(1)
-    print(
-        "\n=================================          Location Info               =================================\n")
-    search_option = input(
-        """Search by Pincode? Or by State/District? \nEnter 1 for Pincode or 2 for State/District. (Default 2) : """)
+
+    print("\n=================================        Location Info        =================================\n")
+    search_option = input("""Search by Pincode? Or by State/District? \nEnter 1 for Pincode or 2 for State/District. (Default 2) : """)
+
 
     if not search_option or int(search_option) not in [1, 2]:
         search_option = 2
@@ -834,11 +811,10 @@ def collect_user_details(request_header):
         location_dtls = get_pincodes()
         excluded_pincodes = None
 
-    print("\n================================= Additional Info =================================\n")
+    print("\n=================================        Additional Info         =================================\n")
 
     # Set booking condition (either one after another or all at once)
-    minimum_slots = input(
-        f"Filter out centers with availability less than ? default (Maximum) {len(beneficiary_dtls)} : ")
+    minimum_slots = input(f"Filter out centers with availability less than ? default (Maximum) {len(beneficiary_dtls)} : ")
     if minimum_slots:
         minimum_slots = (int(minimum_slots)
                          if int(minimum_slots) == 1
@@ -847,7 +823,7 @@ def collect_user_details(request_header):
         minimum_slots = len(beneficiary_dtls)
 
     # Get refresh frequency
-    print("\n=================================  Refresh Frequency  =================================\n")
+    print("\n=================================      Refresh Frequency     =================================\n")
     refresh_freq = input("How often do you want to refresh the calendar (in seconds)? Default 15. Minimum 5. : ")
     refresh_freq = int(refresh_freq) if refresh_freq and int(refresh_freq) >= 5 else 15
 
@@ -855,10 +831,8 @@ def collect_user_details(request_header):
     fee_type = get_fee_type_preference()
 
     # choice to auto book or to choose centers manually
-    print(
-        "\n============================    CAUTION!    =============     CAUTION! CAUTION!    ================      CAUTION!          ========================\n")
-    print(
-        "============== BE CAREFUL WITH THIS OPTION! AUTO-BOOKING WILL BOOK THE FIRST AVAILABLE CENTRE, DATE, AND A RANDOM SLOT!    ========================")
+    print("\n============================    CAUTION!    =============     CAUTION! CAUTION!    ================      CAUTION!          ========================\n")
+    print("============== BE CAREFUL WITH THIS OPTION! AUTO-BOOKING WILL BOOK THE FIRST AVAILABLE CENTRE, DATE, AND A RANDOM SLOT!    ========================")
     auto_book = input("Do you want to enable auto-booking? (y/n) Default # y: ")
     auto_book = "y" if not auto_book else auto_book
 
@@ -1116,8 +1090,7 @@ def confirm_and_proceed(collected_details):
 
 
 def collect_reschedule_appointment_data(active_appointment_detailed):
-    print(
-        f"\n==================           select the user you want to reschedule the appointment for (CHOOSE ONLY ONE USER)            ===================\n")
+    print(f"\n==================           select the user you want to reschedule the appointment for (CHOOSE ONLY ONE USER)            ===================\n")
     clean_data = cleaned_display(active_appointment_detailed)
     display_table(clean_data)
     # loop to force user to enter correct input
@@ -1205,8 +1178,9 @@ def reschedule_appointment(request_header, details, mobile, generate_captcha_pre
         while valid_captcha:
             captcha = generate_captcha(request_header, generate_captcha_pref, api_key, captcha_api_choice)
             details["captcha"] = captcha
-            print(
-                "================================= ATTEMPTING BOOKING ==================================================")
+
+            print("================================= ATTEMPTING BOOKING ==================================================")
+
             resp = requests.post(RESCHEDULE_URL, headers=request_header, json=details)
             print(f"Booking Response Code: {resp.status_code}")
             print(f"Booking Response : {resp.text}")
