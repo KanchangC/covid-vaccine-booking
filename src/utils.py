@@ -199,12 +199,9 @@ def check_and_book(
                 display_table(cleaned_options_for_display)
 
             if auto_book == 'n':
-                #                choice = inputimeout(
-                #                    prompt='----------> Enter a choice e.g: 1.4 for (1st center 4th slot):\n----------> OR wait 15 second for auto update of centers: ',
-                #                    timeout=15)
                 try:
-                    choice = input(
-                        "----------> Enter a choice e.g: 1.4 for (1st center 4th slot):\n----------> OR wait 10 second for auto update of centers: ")
+                    choice = inputimeout(
+                        prompt='----------> Enter a choice e.g: 1.4 for (1st center 4th slot):\n----------> OR wait 10 second for auto update of centers: ', timeout=15 )
                     choice = choice.split('.')
                     choice = [int(item) for item in choice]
                 except ValueError:
