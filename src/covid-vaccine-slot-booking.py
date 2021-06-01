@@ -18,7 +18,6 @@ def is_token_valid(token):
 def multi_cycle_book(request_header, token, mobile, otp_pref, base_request_header, otp_validation_header, info,
                      beneficiary_dtls,
                      collected_details):
-    break_loop = True
     while True:  # infinite-loop
         # create new request_header
         request_header = copy.deepcopy(base_request_header)
@@ -26,8 +25,6 @@ def multi_cycle_book(request_header, token, mobile, otp_pref, base_request_heade
 
         # call function to check and book slots
         try:
-            if break_loop is False:
-                break
             token_valid = is_token_valid(token)
 
             # token is invalid ?
@@ -60,9 +57,12 @@ def multi_cycle_book(request_header, token, mobile, otp_pref, base_request_heade
                                         excluded_pincodes=info.excluded_pincodes,
                                         reschedule_inp=info.reschedule_inp
                                         )
+            if break_loop == "break":
+                break
+
         except Exception as e:
             print(str(e))
-            print('Retrying in 5 seconds')
+            print('Retrying in 5 seconds ')
             time.sleep(5)
 
 
