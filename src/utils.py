@@ -491,9 +491,6 @@ def check_calendar_by_district(request_header, vaccine_type, location_dtls, star
         3. Returns False if token is invalid
         4. Returns list of vaccination centers & slots if available
     """
-#    tor_process = _launch_tor()
-#    response = tor_process.communicate(requests.get('http://ipecho.net/plain'))
-#    print("New Ip Address", response.text)
 
     try:
         print(
@@ -506,13 +503,7 @@ def check_calendar_by_district(request_header, vaccine_type, location_dtls, star
 
         options = []
         for location in location_dtls:
-            resp = requests.get(
-                base_url.format(location["district_id"], start_date),
-                headers=request_header, )
-
-#            resp = tor_process.communicate(requests.get(
-#                base_url.format(location["district_id"], start_date),
-#                headers=request_header, ))
+            resp = requests.get(base_url.format(location["district_id"], start_date), headers=request_header, )
 
             if resp.status_code == 401:
                 print("TOKEN INVALID")
@@ -596,9 +587,6 @@ def check_calendar_by_pincode(request_header, vaccine_type, location_dtls, start
         3. Returns False if token is invalid
         4. Returns list of vaccination centers & slots if available
     """
-#    tor_process = _launch_tor({'ControlPort': '3421', 'SocksPort': '3420'})
-#    response = tor_process.communicate(requests.get('http://ipecho.net/plain'))
-#    print("New Ip Address", response.text)
     try:
         print(
             "============================================================================================================")
@@ -611,9 +599,6 @@ def check_calendar_by_pincode(request_header, vaccine_type, location_dtls, start
         options = []
         for location in location_dtls:
             resp = requests.get(base_url.format(location["pincode"], start_date), headers=request_header)
-#            resp = tor_process.communicate(requests.get(
-#                base_url.format(location["pincode"], start_date),
-#                headers=request_header, ))
 
             if resp.status_code == 401:
                 print("TOKEN INVALID")

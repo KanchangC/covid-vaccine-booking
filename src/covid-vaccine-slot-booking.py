@@ -130,7 +130,7 @@ def main():
 
             if try_file.lower() == 'y':
                 collected_details = get_saved_user_info(filename)
-                print("\n=====================================          Info        =====================================\n")
+                print("\n=====================================           Info        =====================================\n")
                 display_info_dict(collected_details)
 
                 file_acceptable = input("\nProceed with above info? (y/n Default n): ")
