@@ -89,11 +89,13 @@ def main():
         common_header = {
             'User-Agent': get_user_agent()
             , 'content-type': 'application/json'
-            , 'origin': 'https://selfregistration.cowin.gov.in/'
+#            , 'origin': 'https://selfregistration.cowin.gov.in/'
+            , 'origin': '127.0.0.1'
             , 'sec-fetch-site': 'cross-site'
             , 'sec-fetch-mode': 'cors'
             , 'sec-fetch-dest': 'empty'
-            , 'referer': 'https://selfregistration.cowin.gov.in/',
+#            , 'referer': 'https://selfregistration.cowin.gov.in/',
+            , 'referer': '127.0.0.1',
         }
 
         token = None

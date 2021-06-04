@@ -11,6 +11,7 @@ from collections import Counter
 from hashlib import sha256
 from captcha import captcha_builder_manual, captcha_builder_auto, captcha_builder_api
 
+
 BOOKING_URL = "https://cdn-api.co-vin.in/api/v2/appointment/schedule"
 BENEFICIARIES_URL = "https://cdn-api.co-vin.in/api/v2/appointment/beneficiaries"
 CALENDAR_URL_DISTRICT = "https://cdn-api.co-vin.in/api/v2/appointment/sessions/calendarByDistrict?district_id={0}&date={1}"
@@ -30,7 +31,6 @@ try:
 
 except ImportError:
     import os
-    import winsound
 
     if sys.platform == "darwin":
 
@@ -222,11 +222,13 @@ def check_and_book(request_header, beneficiary_dtls, location_dtls, search_optio
             # sort by date and maximum available slots
             start_epoch = int(time.time())
             # if captcha automation is enabled then spend maximum 30 seconds before requesting new availability status from CoWIN. here, max time for both captcha auto and manual is same
-            MAX_ALLOWED_DURATION_OF_STALE_INFORMATION_IN_SECS = 1 * 60 if captcha_automation != 'n' else 1 * 60
+            MAX_ALLOWED_DURATION_OF_STALE_INFORMATION_IN_SECS = 1 * 30 if captcha_automation != 'n' else 1 * 60
             # Try all available centers one by one
             for i in range(0, len(options)):
                 option = options[i]
-                all_slots_of_a_center = option.get("slots", [])
+                #                all_slots_of_a_center = option.get("slots", [])
+                #   randomly choosing 2/3 slots of a center instead of trying all slots one by one to minimise API hit if center is full
+                all_slots_of_a_center = (random.sample(option["slots"], 2)) if ((len(option['slots'])) <= 4) else (random.sample(option["slots"], 3))
                 if not all_slots_of_a_center:
                     continue
                 # Try all slots of a center one by one
@@ -249,6 +251,7 @@ def check_and_book(request_header, beneficiary_dtls, location_dtls, search_optio
                                 "session_id": option["session_id"],
                                 "slot": selected_slot,
                             }
+                            print(f"Booking with info: {new_req}")
                             booking_status = reschedule_appointment(request_header, new_req, mobile, captcha_automation,
                                                                     captcha_automation_api_key, captcha_api_choice)
                         else:
@@ -259,6 +262,7 @@ def check_and_book(request_header, beneficiary_dtls, location_dtls, search_optio
                                 "session_id": option["session_id"],
                                 "slot": selected_slot,
                             }
+                            print(f"Booking with info: {new_req}")
                             booking_status = book_appointment(request_header, new_req, mobile, captcha_automation,
                                                               captcha_automation_api_key, captcha_api_choice)
                         if booking_status == 1000:
@@ -487,6 +491,10 @@ def check_calendar_by_district(request_header, vaccine_type, location_dtls, star
         3. Returns False if token is invalid
         4. Returns list of vaccination centers & slots if available
     """
+#    tor_process = _launch_tor()
+#    response = tor_process.communicate(requests.get('http://ipecho.net/plain'))
+#    print("New Ip Address", response.text)
+
     try:
         print(
             "=========================================================================================================================")
@@ -501,6 +509,10 @@ def check_calendar_by_district(request_header, vaccine_type, location_dtls, star
             resp = requests.get(
                 base_url.format(location["district_id"], start_date),
                 headers=request_header, )
+
+#            resp = tor_process.communicate(requests.get(
+#                base_url.format(location["district_id"], start_date),
+#                headers=request_header, ))
 
             if resp.status_code == 401:
                 print("TOKEN INVALID")
@@ -584,6 +596,9 @@ def check_calendar_by_pincode(request_header, vaccine_type, location_dtls, start
         3. Returns False if token is invalid
         4. Returns list of vaccination centers & slots if available
     """
+#    tor_process = _launch_tor({'ControlPort': '3421', 'SocksPort': '3420'})
+#    response = tor_process.communicate(requests.get('http://ipecho.net/plain'))
+#    print("New Ip Address", response.text)
     try:
         print(
             "============================================================================================================")
@@ -596,6 +611,9 @@ def check_calendar_by_pincode(request_header, vaccine_type, location_dtls, start
         options = []
         for location in location_dtls:
             resp = requests.get(base_url.format(location["pincode"], start_date), headers=request_header)
+#            resp = tor_process.communicate(requests.get(
+#                base_url.format(location["pincode"], start_date),
+#                headers=request_header, ))
 
             if resp.status_code == 401:
                 print("TOKEN INVALID")
@@ -1212,7 +1230,7 @@ def reschedule_appointment(request_header, details, mobile, generate_captcha_pre
             if resp.status_code == 401:
                 print("TOKEN INVALID")
                 return False
-            elif resp.status_code == 200:
+            elif resp.status_code == 204:
                 beep(WARNING_BEEP_DURATION[0], WARNING_BEEP_DURATION[1])
                 print("##############    RESCHEDULED!  ############################    RESCHEDULED!  ##############")
                 print("                        YOUR APPOINTMENT HAS BEEN RESCHEDULED                       ")
